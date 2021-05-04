@@ -88,23 +88,6 @@ void createSquares(const float margin,
 		float x_start = 0.0;
 		float x_end = squareWidth;
 		while ( x_end < WIDTH  ) {
-			/* created movie grid with next button 
-			if (countSquere != 3) {
-				loadTexture(iter->get()->imgUrl()); iter++;
-				glBegin(GL_POLYGON);
-					glTexCoord2f(0.0,0.0); glVertex3f(x_start+margin, bottomY, 0.0);  // left bottom
-					glTexCoord2f(1.0,0.0); glVertex3f(x_end, bottomY, 0.0);  // right bottom
-					glTexCoord2f(1.0,1.0); glVertex3f(x_end, topY, 0.0);  // right top
-					glTexCoord2f(0.0,1.0); glVertex3f(x_start+margin, topY, 0.0);  // left top
-				glEnd();
-			} else {
-				glBegin(GL_TRIANGLES);
-					glVertex3f(x_start+margin + 50, bottomY + 30, 0.0);  // left bottom
-					glVertex3f(x_start+margin + 50, topY - 30, 0.0);  // left top
-					glVertex3f(x_end - 40, topY - 85, 0.0);  // right top
-				glEnd();
-			}
-			*/
 			moviesGrid[row].push_back(*iter);
 			loadTexture(iter->get()->imgUrl()); iter++;
 			glBegin(GL_POLYGON);
@@ -115,7 +98,17 @@ void createSquares(const float margin,
 			glEnd();
 			x_start = x_end;
 			x_end += squareWidth;
+			
 		}// end while loop.
+}
+
+/** @brief draw text on the screen **/
+void renderBitmapString(float x, float y, void* font, const string& text)
+{
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glRasterPos2d(x, y);
+	for (auto ch : text)
+		glutBitmapCharacter(font, ch);
 }
 
 
@@ -129,27 +122,34 @@ void display(void)
 	draw = false;
     glClearColor(0.0f, 0.05f, 0.13f,1.0f);         // disney plus background
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+
+	renderBitmapString(20.0f, 700.0f, GLUT_BITMAP_TIMES_ROMAN_24, "Trending");
+	renderBitmapString(20.0f, 480.0f, GLUT_BITMAP_TIMES_ROMAN_24, "Personalized Curated Movies");
+	renderBitmapString(20.0f, 260.0f, GLUT_BITMAP_TIMES_ROMAN_24, "Because You Set ...");
+
+
 	glGenTextures(1,texture);
 	const float Margin{ 10.0 };
 	const float SquareWidth{ 250.0 };
-	float stripBottomY{ 50 };
+	float stripBottomY{ 40 };
 	float stripTopY{ 250 };
 	bool first(true);
 
 	// create 1st row
 	createSquares(Margin, SquareWidth, stripTopY - Margin, stripBottomY + Margin,0, trendingMovieIter);
 	stripBottomY = stripTopY + Margin;
-	stripTopY += 200;
+	stripTopY += 220;
 
 	// create 2nd row
-	createSquares(Margin, SquareWidth, stripTopY - Margin, stripBottomY + Margin,1, personalizeCuratedMoviesIter);
+	createSquares(Margin, SquareWidth, stripTopY - Margin, stripBottomY + Margin + 40,1, personalizeCuratedMoviesIter);
 	stripBottomY = stripTopY + Margin;
-	stripTopY += 200;
+	stripTopY += 220;
 
 	// create 3rd row
-	createSquares(Margin, SquareWidth, stripTopY - Margin, stripBottomY + Margin,2, becauseYouSetMoviesIter );
+	createSquares(Margin, SquareWidth, stripTopY - Margin, stripBottomY + Margin + 40,2, becauseYouSetMoviesIter );
 	stripBottomY = stripTopY + Margin;
-	stripTopY += 200;
+	stripTopY += 220;
 
 	glutSwapBuffers(); // double buffered - swap the front and back buffers.
 	glDeleteTextures(1, texture);
@@ -257,7 +257,7 @@ int main(int argc, char** argv)
 	glMatrixMode(GL_MODELVIEW);										// setup viewing projection
 	glLoadIdentity();												// start with identity matrix
 	glOrtho(0.0, WIDTH, 0.0, HEIGHT, -1.0, 1.0);				    // set clipping area of 2D orthographic view
-//	glutMouseFunc(onMouse);										    // registers mouse callback function.
+	//glutMouseFunc(onMouse);										    // registers mouse callback function.
 	glutKeyboardFunc(keyInput);								        // registers keyboard event
 	glutSpecialFunc(specialKeyInput);							    // registers function keys.
 	glutReshapeFunc(onReshape);										// registers reshape callback function.
@@ -266,3 +266,4 @@ int main(int argc, char** argv)
 
 	return EXIT_SUCCESS;
 }
+
