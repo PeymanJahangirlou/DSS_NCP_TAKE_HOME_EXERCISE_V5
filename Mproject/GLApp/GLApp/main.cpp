@@ -103,6 +103,7 @@ void createSquares(const float margin,
 		float x_end = squareWidth;
 		int countSquere{ 0 };
 		while ( x_end < WIDTH  ) {
+			/* created movie grid with next button 
 			if (countSquere != 3) {
 				loadTexture(iter->get()->imgUrl()); iter++;
 				glBegin(GL_POLYGON);
@@ -118,6 +119,14 @@ void createSquares(const float margin,
 					glVertex3f(x_end - 40, topY - 85, 0.0);  // right top
 				glEnd();
 			}
+			*/
+			loadTexture(iter->get()->imgUrl()); iter++;
+			glBegin(GL_POLYGON);
+				glTexCoord2f(0.0,0.0); glVertex3f(x_start+margin, bottomY, 0.0);  // left bottom
+				glTexCoord2f(1.0,0.0); glVertex3f(x_end, bottomY, 0.0);  // right bottom
+				glTexCoord2f(1.0,1.0); glVertex3f(x_end, topY, 0.0);  // right top
+				glTexCoord2f(0.0,1.0); glVertex3f(x_start+margin, topY, 0.0);  // left top
+			glEnd();
 			x_start = x_end;
 			x_end += squareWidth;
 			countSquere++;
@@ -185,7 +194,7 @@ void keyInput(unsigned char key, int x, int y)
    std::cout << "x: " << x << "y: " << y << std::endl;
    switch(key) 
    {
-      case 27:
+      case 27: // esc key
          exit(0);
          break;
       default:
@@ -195,19 +204,33 @@ void keyInput(unsigned char key, int x, int y)
 
 /*
 /** @brief Callback routine for non-ASCII key entry
- ** work in progress for moving on the screen arrow keys
- **
+ ** processing arrow keys
+ **/
 void specialKeyInput(int key, int x, int y)
 {
-	std::cout << "x: " << x << "y: " << y << std::endl;
-   if (key == GLUT_KEY_LEFT) 
-   {
-   }
-   if (key == GLUT_KEY_RIGHT) 
-   {
-   }
+
+   switch (key) {
+	   case GLUT_KEY_UP:
+		   cout << "up key is pressed" << endl;
+		   break;
+
+	   case GLUT_KEY_DOWN:
+		   cout << "down key is pressed" << endl;
+		   break;
+
+	   case GLUT_KEY_LEFT:
+		   cout << "left key is pressed" << endl;
+		   break;
+
+	   case GLUT_KEY_RIGHT:
+		   cout << "right key is pressed" << endl;
+		   break;
+	   default:
+		   break;
+   }// end case switch
+
+   std::cout << "(x,y): " << "(" << x << ", " << y << ") ";
 }
-*/
 
 
 /** @brief main function **/
@@ -241,10 +264,8 @@ int main(int argc, char** argv)
 	glutMouseFunc(onMouse);										    // registers mouse callback function.
 	glutDisplayFunc(display);								    	// registers callback functions
 	glutKeyboardFunc(keyInput);								        // registers keyboard event
-//	glutSpecialFunc(specialKeyInput);							    // registers function keys.
+	glutSpecialFunc(specialKeyInput);							    // registers function keys.
 	glutMainLoop();									         		// infinite main loop
 
 	return EXIT_SUCCESS;
 }
-
-
