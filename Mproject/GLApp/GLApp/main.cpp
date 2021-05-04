@@ -28,10 +28,12 @@
 using namespace std;
 
 // Global variables
-const int WIDTH  = 1024;
+const int WIDTH = 1024;
 const int HEIGHT = 800;
+pair<int, int> CurrPosition = std::make_pair(0, 0); // sets to moviesGrid[0][0];
 
 unsigned int texture[1];
+unordered_map<int,vector<std::shared_ptr<Movie>>> moviesGrid;
 
 typedef unordered_set<std::shared_ptr<Movie>>::iterator MovieSetIterator;
 JsonParser::MovieContainer trendingMovieMap{};
@@ -72,24 +74,7 @@ void loadTexture(const std::string & imgUrl)
 		return;
    }
    setUpTexture(movieImage_ptr);
-}
-
-/** @brief creates disney logo on top center of the screen **/
-void createDisneyPlusLogo()
-{
-	const string imgPath{ "disneyPlusLogo.jpg" };
-	auto movieImage_ptr = Utility::loadImageFromDirectory(imgPath);
-	if (!movieImage_ptr) {
-		cout << "LOASTEXTURE::Utility::loadImageFromDirectory() Failed\n" << endl;
-		return;
-	}
-	setUpTexture(movieImage_ptr);
-	glBegin(GL_POLYGON);
-		glTexCoord2f(0.0,0.0); glVertex3f(300, HEIGHT - 150, 0.0);  // left bottom
-		glTexCoord2f(1.0,0.0); glVertex3f(600, HEIGHT - 150, 0.0);  // right bottom
-		glTexCoord2f(1.0,1.0); glVertex3f(600, HEIGHT - 30, 0.0);  // right top
-		glTexCoord2f(0.0,1.0); glVertex3f(300, HEIGHT - 30, 0.0);  // left top
-	glEnd();
+   movieImage_ptr.reset();
 }
 
 /** @brief creates 3 * 3 Grids then add movie image  plus 3 arrow triangles  **/
@@ -97,11 +82,11 @@ void createSquares(const float margin,
 				   const float squareWidth,
 				   const float topY,
 				   const float bottomY,
+				   const int   row,
 			       unordered_set<std::shared_ptr<Movie>>::iterator iter )
 {
 		float x_start = 0.0;
 		float x_end = squareWidth;
-		int countSquere{ 0 };
 		while ( x_end < WIDTH  ) {
 			/* created movie grid with next button 
 			if (countSquere != 3) {
@@ -120,6 +105,7 @@ void createSquares(const float margin,
 				glEnd();
 			}
 			*/
+			moviesGrid[row].push_back(*iter);
 			loadTexture(iter->get()->imgUrl()); iter++;
 			glBegin(GL_POLYGON);
 				glTexCoord2f(0.0,0.0); glVertex3f(x_start+margin, bottomY, 0.0);  // left bottom
@@ -129,16 +115,20 @@ void createSquares(const float margin,
 			glEnd();
 			x_start = x_end;
 			x_end += squareWidth;
-			countSquere++;
 		}// end while loop.
 }
 
 
+static bool draw{ true }; // draw function gets called once
 /** @brief display function for GLUT  **/
 void display(void)
 {
+	if (!draw)
+		return;
+
+	draw = false;
     glClearColor(0.0f, 0.05f, 0.13f,1.0f);         // disney plus background
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glGenTextures(1,texture);
 	const float Margin{ 10.0 };
 	const float SquareWidth{ 250.0 };
@@ -146,45 +136,38 @@ void display(void)
 	float stripTopY{ 250 };
 	bool first(true);
 
-	// create disney + logo
-	createDisneyPlusLogo();
-
-	createSquares(Margin, SquareWidth, stripTopY - Margin, stripBottomY + Margin, trendingMovieIter);
+	// create 1st row
+	createSquares(Margin, SquareWidth, stripTopY - Margin, stripBottomY + Margin,0, trendingMovieIter);
 	stripBottomY = stripTopY + Margin;
 	stripTopY += 200;
 
 	// create 2nd row
-	createSquares(Margin, SquareWidth, stripTopY - Margin, stripBottomY + Margin, personalizeCuratedMoviesIter);
+	createSquares(Margin, SquareWidth, stripTopY - Margin, stripBottomY + Margin,1, personalizeCuratedMoviesIter);
 	stripBottomY = stripTopY + Margin;
 	stripTopY += 200;
 
-	createSquares(Margin, SquareWidth, stripTopY - Margin, stripBottomY + Margin, becauseYouSetMoviesIter );
+	// create 3rd row
+	createSquares(Margin, SquareWidth, stripTopY - Margin, stripBottomY + Margin,2, becauseYouSetMoviesIter );
 	stripBottomY = stripTopY + Margin;
 	stripTopY += 200;
 
 	glutSwapBuffers(); // double buffered - swap the front and back buffers.
 	glDeleteTextures(1, texture);
-
 }
 
+/** @brief resize callback  funciton **/
+void onReshape(int newWidth, int newHeight)
+{
+	// ignore new width and height
+	glutReshapeWindow(WIDTH, HEIGHT);
+
+}
 
 /*@brief Mouse input processing routin. for debug */
 void onMouse(int buttonId, int buttonState, int x, int y) 
 {
 	if(buttonState != GLUT_DOWN)
 		return;
-	/* for selecting item under mouse  -- coming soon
-	auto windowWidth  = glutGet(GLUT_WINDOW_WIDTH);
-	auto windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
-
-	GLbyte  colorUnderMouse[4];
-	GLfloat depth;
-	GLuint  index;
-
-	glReadPixels(x, windowWidth  - y - 1, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &colorUnderMouse);
-	glReadPixels(x, windowHeight - y - 1, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
-	glReadPixels(x, windowHeight - y - 1, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
-	*/
 	cout << "mouse coordinates -- (x,y): " << "(" << x << ", " << y << ")" << endl;
 }
 
@@ -208,28 +191,43 @@ void keyInput(unsigned char key, int x, int y)
  **/
 void specialKeyInput(int key, int x, int y)
 {
-
    switch (key) {
 	   case GLUT_KEY_UP:
-		   cout << "up key is pressed" << endl;
+		   CurrPosition.first++;
 		   break;
 
 	   case GLUT_KEY_DOWN:
-		   cout << "down key is pressed" << endl;
+		   CurrPosition.first--;
 		   break;
 
 	   case GLUT_KEY_LEFT:
-		   cout << "left key is pressed" << endl;
+		   CurrPosition.second--;
 		   break;
 
 	   case GLUT_KEY_RIGHT:
-		   cout << "right key is pressed" << endl;
+		   CurrPosition.second++;
 		   break;
+
 	   default:
 		   break;
    }// end case switch
 
-   std::cout << "(x,y): " << "(" << x << ", " << y << ") ";
+    // validate Columns
+	if (CurrPosition.second >= (int)moviesGrid[0].size()  || CurrPosition.second < 0) {
+		CurrPosition.second = 0;
+	}
+	// validate rows
+	if (CurrPosition.first >= (int)moviesGrid.size()  || CurrPosition.first < 0) {
+		CurrPosition.first = 0;
+	}
+
+	static bool firstCall{ true };
+	if (firstCall) {
+		firstCall = false;
+		CurrPosition = { 0,0 };
+	}
+	cout << "You selected:\t";
+	cout << moviesGrid[CurrPosition.first][CurrPosition.second].get()->title() << endl;
 }
 
 
@@ -242,9 +240,7 @@ int main(int argc, char** argv)
 	json_parser.getMovieSet(trendingMovieMap);
 	trendingMovieIter = trendingMovieMap["TrendingSet"].begin();
 
-	const string personalizedCuratedRefId{ "f506622c-4f75-4f87-bafe-3e08a4433914" };
-	json_parser.readByRefId(personalizedCuratedRefId);
-	json_parser.getMovieSet(personalizedCuratedMap);
+	const string personalizedCuratedRefId{ "f506622c-4f75-4f87-bafe-3e08a4433914" }; json_parser.readByRefId(personalizedCuratedRefId); json_parser.getMovieSet(personalizedCuratedMap);
 	personalizeCuratedMoviesIter = personalizedCuratedMap["PersonalizedCuratedSet"].begin();
 
 	const string becauseYouSetRefId{ "bd1bfb9a-bbf7-43a0-ac5e-3e3889d7224d" };
@@ -261,10 +257,11 @@ int main(int argc, char** argv)
 	glMatrixMode(GL_MODELVIEW);										// setup viewing projection
 	glLoadIdentity();												// start with identity matrix
 	glOrtho(0.0, WIDTH, 0.0, HEIGHT, -1.0, 1.0);				    // set clipping area of 2D orthographic view
-	glutMouseFunc(onMouse);										    // registers mouse callback function.
-	glutDisplayFunc(display);								    	// registers callback functions
+//	glutMouseFunc(onMouse);										    // registers mouse callback function.
 	glutKeyboardFunc(keyInput);								        // registers keyboard event
 	glutSpecialFunc(specialKeyInput);							    // registers function keys.
+	glutReshapeFunc(onReshape);										// registers reshape callback function.
+	glutDisplayFunc(display);								    	// registers display callback function.
 	glutMainLoop();									         		// infinite main loop
 
 	return EXIT_SUCCESS;
