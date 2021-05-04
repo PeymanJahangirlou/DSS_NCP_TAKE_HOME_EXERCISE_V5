@@ -159,6 +159,26 @@ void display(void)
 }
 
 
+/*@brief Mouse input processing routin. for debug */
+void onMouse(int buttonId, int buttonState, int x, int y) 
+{
+	if(buttonState != GLUT_DOWN)
+		return;
+	/* for selecting item under mouse  -- coming soon
+	auto windowWidth  = glutGet(GLUT_WINDOW_WIDTH);
+	auto windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+
+	GLbyte  colorUnderMouse[4];
+	GLfloat depth;
+	GLuint  index;
+
+	glReadPixels(x, windowWidth  - y - 1, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &colorUnderMouse);
+	glReadPixels(x, windowHeight - y - 1, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+	glReadPixels(x, windowHeight - y - 1, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
+	*/
+	cout << "mouse coordinates -- (x,y): " << "(" << x << ", " << y << ")" << endl;
+}
+
 /* @ Keyboard input processing routine. work in progress **/
 void keyInput(unsigned char key, int x, int y)
 {
@@ -218,6 +238,7 @@ int main(int argc, char** argv)
 	glMatrixMode(GL_MODELVIEW);										// setup viewing projection
 	glLoadIdentity();												// start with identity matrix
 	glOrtho(0.0, WIDTH, 0.0, HEIGHT, -1.0, 1.0);				    // set clipping area of 2D orthographic view
+	glutMouseFunc(onMouse);										    // registers mouse callback function.
 	glutDisplayFunc(display);								    	// registers callback functions
 	glutKeyboardFunc(keyInput);								        // registers keyboard event
 //	glutSpecialFunc(specialKeyInput);							    // registers function keys.
@@ -225,6 +246,5 @@ int main(int argc, char** argv)
 
 	return EXIT_SUCCESS;
 }
-
 
 
