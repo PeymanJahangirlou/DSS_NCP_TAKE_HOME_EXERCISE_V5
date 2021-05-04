@@ -3,7 +3,7 @@ Disney Streaming Services - Connected Device Native Client Engineering
 * Create a screen that consumes Disney Plus home page API and renders the pre-populated data onto the screen
 * Navigation Support
 * ------------------ Mouse input -- for debug. 
-* ------------------ Similar to a remote control -- up/down/left/right/enter/back/etc      coming soon
+* ------------------ Similar to a remote control -- up/down/left/right/enter/back/etc      
 * Layout 
 * ------ for simplicity, creates 4 * 4 layout 
 * ------ it can be multiple rows of data
