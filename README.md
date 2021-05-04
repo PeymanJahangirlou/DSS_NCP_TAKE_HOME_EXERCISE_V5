@@ -1,9 +1,23 @@
 # DSS_NCP_TAKE_HOME_EXERCISE_V5
 Disney Streaming Services - Connected Device Native Client Engineering
+* Create a screen that consumes Disney Plus home page API and renders the pre-populated data onto the screen
+* Navigation Support
+* ------------------ Mouse input -- for debug. 
+* ------------------ Similar to a remote control -- up/down/left/right/enter/back/etc      coming soon
+* Layout 
+* ------ for simplicity, creates 4 * 4 layout 
+* ------ it can be multiple rows of data
+* ------ grids can scale up to fill the entire screen
+* 
+* Special Notes
+* ----------------- can dynamically populate the 'ref' sets as they come into view
+* ----------------- Allow interaction or selection of a tile                              coming soon
+* ----------------- Incorporate transition or visual aesthetics                           coming soon
+
 
 # A note on backward-compatibility
-* The application is build with C++14, and C++17.
-* can't be used with older compilers.
+* The application is build with C++14, and C++17
+* can't be used with older compilers
 
 # dependencies
 * libcurl   
@@ -16,3 +30,6 @@ Disney Streaming Services - Connected Device Native Client Engineering
 * download DSS_NCP_TAK_HOME_EXERCISE_V5
 * Open The Project in Microsft Visual C++ 
 * Build and run
+
+# Building Application in Mac         
+* coming soon
