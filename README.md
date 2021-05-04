@@ -11,8 +11,8 @@ Disney Streaming Services - Connected Device Native Client Engineering
 * 
 * Special Notes
 * ----------------- can dynamically populate the 'ref' sets as they come into view
-* ----------------- Allow interaction or selection of a tile                              coming soon
-* ----------------- Incorporate transition or visual aesthetics                           coming soon
+* ----------------- Allow interaction or selection of a tile                             --------- (coming soon)
+* ----------------- Incorporate transition or visual aesthetics                          --------- (coming soon)
 
 
 # A note on backward-compatibility
