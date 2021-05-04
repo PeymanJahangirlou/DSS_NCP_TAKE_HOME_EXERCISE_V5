@@ -13,6 +13,7 @@ Disney Streaming Services - Connected Device Native Client Engineering
 * ----------------- can dynamically populate the 'ref' sets as they come into view
 * ----------------- Allow interaction or selection of a tile                             --------- (coming soon)
 * ----------------- Incorporate transition or visual aesthetics                          --------- (coming soon)
+* ----------------- Resize is disabled for demo 
 
 
 # A note on backward-compatibility
