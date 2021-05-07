@@ -20,7 +20,7 @@ Disney Streaming Services - Connected Device Native Client Engineering
 
 
 # A note on backward-compatibility
-* The application is built with C++14, and C++17
+* The application is built with C++11, C++14, and C++17
 * can't be used with older compilers
 
 # dependencies
